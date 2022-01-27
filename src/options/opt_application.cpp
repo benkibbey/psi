@@ -103,9 +103,53 @@ QWidget *OptionsTabApplication::widget()
     });
     connect(d->ck_docklet, &QCheckBox::stateChanged, this, &OptionsTabApplication::doEnableQuitOnClose);
     connect(d->ck_auto_load, &QCheckBox::toggled, this, [this]() { autostartOptChanged_ = true; });
+#ifdef HAVE_LIBPWMD
+    connect(d->pb_socket, SIGNAL(clicked(bool)), this, SLOT(slotSelectSocket(bool)));
+#ifdef HAVE_KEYCHAIN
+    connect(d->ck_useKeychain, SIGNAL(stateChanged(int)), this, SLOT(slotUseKeychainChanged(int)));
+    connect(d->gb_useLibpwmd, SIGNAL(clicked(bool)), this, SLOT(slotUseLibpwmdChanged(bool)));
+#endif
+#endif
 
     return w;
 }
+
+#ifdef HAVE_LIBPWMD
+#include "pwmdSocketDialog.h"
+
+#ifdef HAVE_KEYCHAIN
+void
+OptionsTabApplication::slotUseKeychainChanged(int s)
+{
+  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+
+  if (s == Qt::Checked)
+    d->gb_useLibpwmd->setChecked(false);
+}
+
+void
+OptionsTabApplication::slotUseLibpwmdChanged(bool b)
+{
+  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+
+  if (b)
+    d->ck_useKeychain->setChecked(false);
+}
+#endif
+
+void
+OptionsTabApplication::slotSelectSocket(bool b)
+{
+  (void)b;
+  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+  PwmdSocketDialog p(d->le_socket->text());
+
+  if (!p.exec())
+    return;
+
+  d->le_socket->setText(p.socket());
+}
+#endif
 
 void OptionsTabApplication::setHaveAutoUpdater(bool b) { haveAutoUpdater_ = b; }
 
@@ -119,6 +163,10 @@ void OptionsTabApplication::applyOptions()
     PsiOptions::instance()->setOption("options.ui.contactlist.quit-on-close", d->ck_quitOnClose->isChecked());
     if (!ApplicationInfo::isPortable()) {
         PsiOptions::instance()->setOption("options.keychain.enabled", d->ck_useKeychain->isChecked());
+        PsiOptions::instance()->setOption("options.libpwmd.enabled", d->gb_useLibpwmd->isChecked());
+        PsiOptions::instance()->setOption("options.libpwmd.dataFile", d->le_dataFile->text());
+        PsiOptions::instance()->setOption("options.libpwmd.socket", d->le_socket->text());
+        PsiOptions::instance()->setOption("options.libpwmd.rootElement", d->le_rootElement->text());
     }
 
     // Auto-update
@@ -194,6 +242,10 @@ void OptionsTabApplication::restoreOptions()
     d->ck_quitOnClose->setChecked(PsiOptions::instance()->getOption("options.ui.contactlist.quit-on-close").toBool());
     if (!ApplicationInfo::isPortable()) {
         d->ck_useKeychain->setChecked(PsiOptions::instance()->getOption("options.keychain.enabled").toBool());
+        d->gb_useLibpwmd->setChecked(PsiOptions::instance()->getOption("options.libpwmd.enabled").toBool());
+        d->le_dataFile->setText(PsiOptions::instance()->getOption("options.libpwmd.dataFile").toString());
+        d->le_socket->setText(PsiOptions::instance()->getOption("options.libpwmd.socket").toString());
+        d->le_rootElement->setText(PsiOptions::instance()->getOption("options.libpwmd.rootElement").toString());
     }
 
     // docklet
@@ -246,6 +298,12 @@ void OptionsTabApplication::restoreOptions()
     d->ck_useKeychain->setVisible(!ApplicationInfo::isPortable());
 #else
     d->ck_useKeychain->setVisible(false);
+#endif
+#ifdef HAVE_LIBPWMD
+    d->gb_useLibpwmd->setVisible(!ApplicationInfo::isPortable());
+#else
+    d->gb_useLibpwmd->setChecked(false);
+    d->gb_useLibpwmd->setVisible(false);
 #endif
 }
 

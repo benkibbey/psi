@@ -34,6 +34,9 @@
 #include "psicon.h"
 #include "psiiconset.h"
 #include "psioptions.h"
+#ifdef HAVE_LIBPWMD
+#include "pwmdprivate.h"
+#endif
 #include "translationmanager.h"
 
 #include <QBitmap>
@@ -447,6 +450,10 @@ PSI_EXPORT_FUNC int main(int argc, char *argv[])
     //   third-party keyboard layout switching tools
 #if defined(Q_OS_WIN) && defined(WEBENGINE)
     ImmDisableIME(-1);
+#endif
+
+#ifdef HAVE_LIBPWMD
+    (void)pwmd_init();
 #endif
 
     // If Psi runs as uri handler the commandline might contain

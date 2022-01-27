@@ -94,6 +94,9 @@
 #include "psioptions.h"
 #include "psiprivacymanager.h"
 #include "psiselfcontact.h"
+#ifdef HAVE_LIBPWMD
+#include "pwmdprivate.h"
+#endif
 #include "qwextend.h"
 //#include "qssl.h"
 #include "rc.h"
@@ -1052,6 +1055,10 @@ PsiAccount::PsiAccount(const UserAccount &acc, PsiContactList *parent, TabManage
     // create XMPP::Client
     d->client = new Client;
 
+#ifdef HAVE_LIBPWMD
+    pwm = nullptr;
+#endif
+
     // Plugins
 #ifdef PSI_PLUGINS
     PluginManager::instance()->addAccount(this, d->client);
@@ -1253,6 +1260,9 @@ PsiAccount::~PsiAccount()
     d->psi->ftdlg()->killTransfers(this);
 #endif
 
+#ifdef HAVE_LIBPWMD
+    delete pwm;
+#endif
     delete d->fileSharingDeviceOpener;
     delete d->avCallManager;
     delete d->voiceCaller;
@@ -1832,6 +1842,50 @@ void PsiAccount::cs_securityLayerActivated(int layer)
     }
 }
 
+#ifdef HAVE_LIBPWMD
+void
+PsiAccount::slotElementContentResult(gpg_error_t rc, QString result)
+{
+  delete pwm;
+  pwm = NULL;
+
+  if (rc)
+    {
+      d->stream->abortAuth();
+      return;
+    }
+
+  d->stream->setPassword(result);
+  if (d->acc.opt_pass) {
+      // keychain read success. erase from xml if any
+      d->acc.opt_pass = false;
+      emit updatedAccount();
+  }
+  d->stream->continueAfterParams();
+}
+
+void
+PsiAccount::slotSaveElementContentResult(gpg_error_t rc, bool done)
+{
+  if (rc || done)
+    {
+      delete pwm;
+      pwm = NULL;
+      return;
+    }
+
+  pwm->save();
+}
+
+void
+PsiAccount::slotKnownHostCallback (void *data, const char *host,
+                                   const char *key, size_t len)
+{
+  gpg_error_t rc = Pwmd::knownHostPrompt (data, host, key, len);
+  emit knownHostRc (rc);
+}
+#endif
+
 void PsiAccount::cs_needAuthParams(bool user, bool pass, bool realm)
 {
     if (user) {
@@ -1863,6 +1917,30 @@ void PsiAccount::cs_needAuthParams(bool user, bool pass, bool realm)
         if (d->acc.storeSaltedHashedPassword)
             d->stream->setSCRAMStoredSaltedHash(d->acc.scramSaltedHashPassword);
     }
+
+#ifdef HAVE_LIBPWMD
+    if (isLibpwmdEnabled()) {
+        if (PwmdPrivate::checkRequirements())
+          {
+            pwm = new PwmdPrivate(userAccount(), this);
+            connect(pwm,
+                    SIGNAL(elementContentResult(gpg_error_t, QString)),
+                    this,
+                    SLOT(slotElementContentResult(gpg_error_t, QString)));
+            connect(pwm,
+                    SIGNAL(knownHost(void *, const char *, const char *,
+                                     size_t)),
+                    this,
+                    SLOT (slotKnownHostCallback(void *, const char *,
+                                                const char *, size_t)));
+            pwm->getPassword();
+          }
+        else
+          d->stream->abortAuth();
+        return;
+    }
+#endif
+
 #ifdef HAVE_KEYCHAIN
     bool useKeyring = isKeychainEnabled();
     if (pass) {
@@ -3185,6 +3263,31 @@ bool PsiAccount::passwordPrompt()
 
 void PsiAccount::savePassword()
 {
+#ifdef HAVE_LIBPWMD
+    if (isLibpwmdEnabled())
+      {
+        if (!d->acc.opt_pass)
+          return;
+
+        if (PwmdPrivate::checkRequirements())
+          {
+            pwm = new PwmdPrivate(userAccount(), this);
+            connect(pwm,
+                    SIGNAL(saveElementContentResult(gpg_error_t, bool)),
+                    this,
+                    SLOT(slotSaveElementContentResult(gpg_error_t, bool)));
+            connect(pwm,
+                    SIGNAL(knownHost(void *, const char *, const char *,
+                                     size_t)),
+                    this,
+                    SLOT (slotKnownHostCallback(void *, const char *,
+                                                const char *, size_t)));
+            pwm->savePassword();
+          }
+        return;
+      }
+#endif
+
 #ifdef HAVE_KEYCHAIN
     if (!isKeychainEnabled() || !d->acc.opt_pass) {
         return;

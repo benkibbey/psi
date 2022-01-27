@@ -104,6 +104,106 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="gb_useLibpwmd">
+     <property name="title">
+      <string>Use libpwmd for credential storage</string>
+     </property>
+     <property name="checkable">
+	 <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout">
+	<item>
+	<widget class="QLabel" name="textLabel3">
+	 <property name="whatsThis">
+	  <string>The data file to open on the pwmd server.</string>
+	 </property>
+	 <property name="text">
+	  <string>Data file:</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	 <widget class="QLineEdit" name="le_dataFile">
+	  <property name="placeholderText">
+	   <string>Required</string>
+	  </property>
+	 </widget>
+	</item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout">
+	<item>
+	 <widget class="QLabel" name="textLabel4">
+	  <property name="whatsThis">
+	   <string>The pwmd socket to connect to.</string>
+	  </property>
+	  <property name="text">
+	   <string>Socket:</string>
+	  </property>
+	 </widget>
+	</item>
+	<item>
+	 <widget class="QLineEdit" name="le_socket">
+	  <property name="placeholderText">
+	   <string>Default</string>
+	  </property>
+	 </widget>
+	</item>
+	<item>
+	 <widget class="QPushButton" name="pb_socket">
+	  <property name="whatsThis">
+	   <string>Select and configure pwmd sockets.</string>
+	  </property>
+	  <property name="text">
+	   <string>Select...</string>
+	  </property>
+	 </widget>
+	</item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout">
+	<item>
+	 <widget class="QLabel" name="textLabel5">
+	  <property name="whatsThis">
+	   <string>The root element of where to find other required account elements. Use a ^ to separate elements if needed.</string>
+	  </property>
+	  <property name="text">
+	   <string>Root element:</string>
+	  </property>
+	 </widget>
+	</item>
+	<item>
+	 <widget class="QLineEdit" name="le_rootElement">
+	  <property name="placeholderText">
+	   <string>Optional</string>
+	  </property>
+	 </widget>
+	</item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout">
      <item>
       <widget class="QLabel" name="textLabel1">
@@ -244,6 +344,10 @@
   <tabstop>ck_dockDCstyle</tabstop>
   <tabstop>ck_dockHideMW</tabstop>
   <tabstop>ck_dockToolMW</tabstop>
+  <tabstop>gb_useLibpwmd</tabstop>
+  <tabstop>le_dataFile</tabstop>
+  <tabstop>le_socket</tabstop>
+  <tabstop>le_rootElement</tabstop>
   <tabstop>le_dtPort</tabstop>
   <tabstop>le_dtExternal</tabstop>
  </tabstops>

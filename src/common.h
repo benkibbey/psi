@@ -193,6 +193,10 @@ QString decodePassword(const QString &, const QString &);
 #ifdef HAVE_KEYCHAIN
 bool isKeychainEnabled();
 #endif
+#ifdef HAVE_LIBPWMD
+bool isLibpwmdEnabled();
+#endif
+bool isPasswordManagerEnabled();
 
 bool operator!=(const QMap<QString, QString> &, const QMap<QString, QString> &);
 

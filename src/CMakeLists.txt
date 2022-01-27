@@ -119,6 +119,16 @@ if(HAIKU)
     list(APPEND EXTRA_LIBS root be network)
 endif()
 
+if(USE_LIBPWMD)
+    find_package(LibPwmd QUIET)
+    list(APPEND EXTRA_LIBS ${PC_LIBPWMD_LIBRARIES} )
+    include_directories(
+	${LIBPWMD_INCLUDE_DIR}
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc
+    )
+    set(LIBPWMD_QRC ${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/qpwmc.qrc)
+endif()
+
 if(USE_ENCHANT)
     find_package(Enchant REQUIRED)
     list(APPEND EXTRA_LIBS ${Enchant_LIBRARY})
@@ -332,6 +342,7 @@ endif()
 set(RESOURCES
     ${PROJECT_SOURCE_DIR}/psi.qrc
     ${ICONSETSQRC_OUTPUT_FILE}
+    ${LIBPWMD_QRC}
 )
 if(IS_WEBKIT OR IS_WEBENGINE)
     list(APPEND RESOURCES ${PROJECT_SOURCE_DIR}/themes/chatview.qrc)

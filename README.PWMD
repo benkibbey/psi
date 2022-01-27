@@ -1,0 +1,55 @@
+When pwmd support is enabled in the Application section of the Options dialog
+then Psi will store and retrieve password information for all active account
+profiles. New account registration is supported but new profiles using
+existing account information will need to have the needed XML elements already
+created. This can be done by using a pwmd client. QPwmc is a Qt client and
+pwmc is a command line client included with libpwmd.  See below for the
+required elements.
+
+Account removal from the XMPP server is also supported but note that the XML
+elements will not be removed from the pwmd data file although you can remove
+them manually by using the pwmd editor. Also note that when pwmd support is
+enabled and you are changing a password for an account, the old password is
+not required.
+
+After cloning the git repository be sure to initialize the required
+submodules:
+
+    git submodule init
+    git submodule sync
+    git submodule update
+
+The libpwmd and pwmd version prerequisites are mentioned in the qpwmc
+submodule README file since these can change at some later commit of the
+submodule.
+
+Now configure Psi to enable libpwmd support by adding:
+
+    -DUSE_LIBPWMD=ON
+
+to the cmake options.
+
+The data file which pwmd uses to save account information to is an (encrypted)
+XML file. The below mentioned root_element is optional but it may be an
+element somewhere in an already created element tree (i.e., im/XMPP). It can
+be created manually with an pwmd editor or by using a qpwmc form:
+
+       qpwmc -f /usr/local/share/qpwmc/xmpp.xml
+
+after installation.
+
+The XML document structure should look like this:
+
+    <root_element>
+	<your_jabber_id>
+		<password>yourpassword</password>
+	</your_jabber_id>
+    </root_element>
+
+If you need help understanding how this all works then check out the libpwmd
+tutorial[1]. If that doesn't help then send me an email.
+
+1. https://gitlab.com/bjk/libpwmd/wikis
+
+Ben Kibbey <bjk@luxsci.net>
+XMPP: bjk@jabber.org

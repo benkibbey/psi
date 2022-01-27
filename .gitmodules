@@ -13,3 +13,6 @@
 [submodule "3rdparty/qite"]
 	path = 3rdparty/qite
 	url = https://github.com/Ri0n/qite.git
+[submodule "3rdparty/qpwmc"]
+	path = 3rdparty/qpwmc
+	url = https://gitlab.com/bjk/qpwmc.git

@@ -31,6 +31,9 @@
 #include "mood.h"
 #include "psiactions.h"
 #include "psievent.h"
+#ifdef HAVE_LIBPWMD
+#include "pwmdprivate.h"
+#endif
 #include "xmpp_encryptionhandler.h"
 #include "xmpp_reference.h"
 #include "xmpp_rosterx.h"
@@ -62,6 +65,9 @@ class PsiContact;
 class PsiContactList;
 class PsiHttpAuthRequest;
 class PsiIcon;
+#ifdef HAVE_LIBPWMD
+class PwmdPrivate;
+#endif
 class QHostAddress;
 class QIcon;
 class QMimeData;
@@ -332,6 +338,9 @@ signals:
     void beginBulkContactUpdate();
     void endBulkContactUpdate();
     void rosterRequestFinished();
+#ifdef HAVE_LIBPWMD
+    void knownHostRc (gpg_error_t);
+#endif
 
 public slots:
     void sendFiles(const Jid &, const QStringList &fileList = QStringList());
@@ -515,11 +524,19 @@ protected:
 private slots:
     void eventFromXml(const PsiEvent::Ptr &e);
     void simulateContactOffline(const XMPP::Jid &contact);
+#ifdef HAVE_LIBPWMD
+    void slotElementContentResult(gpg_error_t, QString);
+    void slotSaveElementContentResult(gpg_error_t, bool);
+    void slotKnownHostCallback(void *, const char *, const char *, size_t);
+#endif
 
 private:
     class Private;
     friend class Private;
     Private *d;
+#ifdef HAVE_LIBPWMD
+    PwmdPrivate *pwm;
+#endif
 
     void handleEvent(const PsiEvent::Ptr &e, ActivationType activationType);
 

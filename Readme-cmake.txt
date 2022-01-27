@@ -129,6 +129,10 @@ or
 
   to enable Qt5Keychain library support
 
+> -USE_LIBPWMD=ON
+
+  to enable libpwmd library support
+
 > -DBUILD_PSIMEDIA=ON
 
   build psimedia plugin if sources found in project folder

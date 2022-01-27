@@ -338,17 +338,13 @@ void UserAccount::toOptions(OptionsTree *o, QString base)
     o->setOption(base + ".scram.store-salted-password", storeSaltedHashedPassword);
     o->setOption(base + ".scram.salted-password", scramSaltedHashPassword);
 
-#ifdef HAVE_KEYCHAIN
-    if (!isKeychainEnabled()) {
-#endif
+    if (!isPasswordManagerEnabled()) {
         if (opt_pass) {
             o->setOption(base + ".password", encodePassword(pass, jid));
         } else {
             o->setOption(base + ".password", "");
         }
-#ifdef HAVE_KEYCHAIN
     }
-#endif
     o->setOption(base + ".use-host", opt_host);
     o->setOption(base + ".security-level", security_level);
     switch (ssl) {

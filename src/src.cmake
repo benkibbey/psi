@@ -317,6 +317,29 @@ elseif(WIN32)
         )
 endif()
 
+if(USE_LIBPWMD)
+    list(APPEND SOURCES
+        pwmdprivate.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmd.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdFileDialog.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdRemoteHost.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketDialog.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketWidget.cpp
+        )
+    list(APPEND HEADERS
+        pwmdprivate.h
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmd.h
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdFileDialog.h
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdRemoteHost.h
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketDialog.h
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketWidget.h
+        )
+    list(APPEND FORMS
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketDialog.ui
+	${PROJECT_SOURCE_DIR}/3rdparty/qpwmc/pwmdSocketWidget.ui
+        )
+endif()
+
 # Source files
 list(APPEND SOURCES
     aboutdlg.cpp
