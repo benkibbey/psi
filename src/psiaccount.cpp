@@ -1871,6 +1871,12 @@ PsiAccount::slotSaveElementContentResult(gpg_error_t rc, bool done)
     {
       delete pwm;
       pwm = NULL;
+      if (!rc && done)
+        {
+          d->acc.opt_pass = false;
+          d->acc.pass.clear();
+          emit updatedAccount(); // to rewrite accounts.xml
+        }
       return;
     }
 
