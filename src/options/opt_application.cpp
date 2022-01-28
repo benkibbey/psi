@@ -118,36 +118,34 @@ QWidget *OptionsTabApplication::widget()
 #include "pwmdSocketDialog.h"
 
 #ifdef HAVE_KEYCHAIN
-void
-OptionsTabApplication::slotUseKeychainChanged(int s)
+void OptionsTabApplication::slotUseKeychainChanged(int s)
 {
-  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+    OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
 
-  if (s == Qt::Checked)
-    d->gb_useLibpwmd->setChecked(false);
+    if (s == Qt::Checked)
+        d->gb_useLibpwmd->setChecked(false);
 }
 
-void
-OptionsTabApplication::slotUseLibpwmdChanged(bool b)
+void OptionsTabApplication::slotUseLibpwmdChanged(bool b)
 {
-  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+    OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
 
-  if (b)
-    d->ck_useKeychain->setChecked(false);
+    if (b)
+      d->ck_useKeychain->setChecked(false);
 }
 #endif
 
 void
 OptionsTabApplication::slotSelectSocket(bool b)
 {
-  (void)b;
-  OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
-  PwmdSocketDialog p(d->le_socket->text());
+    (void)b;
+    OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+    PwmdSocketDialog p(d->le_socket->text());
 
-  if (!p.exec())
-    return;
+    if (!p.exec())
+        return;
 
-  d->le_socket->setText(p.socket());
+    d->le_socket->setText(p.socket());
 }
 #endif
 

@@ -169,7 +169,7 @@ bool isKeychainEnabled()
 #endif
 
 #ifdef HAVE_LIBPWMD
-bool isLibpwmdEnabled ()
+bool isLibpwmdEnabled()
 {
     return !ApplicationInfo::isPortable()
         && PsiOptions::instance()->getOption("options.libpwmd.enabled", false).toBool();
@@ -178,19 +178,15 @@ bool isLibpwmdEnabled ()
 
 bool isPasswordManagerEnabled()
 {
-    bool b = false;
+    int n = 0;
 
 #ifdef HAVE_KEYCHAIN
-    if (!b)
-        b = isKeychainEnabled();
+    n |= isKeychainEnabled();
 #endif
-
 #ifdef HAVE_LIBPWMD
-    if (!b)
-        b = isLibpwmdEnabled();
+    n |= isLibpwmdEnabled();
 #endif
-
-    return b;
+    return n ? true : false;
 }
 
 QString status2txt(int status)

@@ -32,7 +32,7 @@ class PwmdPrivate : public Pwmd
 	~PwmdPrivate();
         void getPassword();
         void savePassword();
-        static bool checkRequirements ();
+        static bool checkRequirements();
 
     signals:
         void elementContentResult(gpg_error_t, QString);
@@ -40,7 +40,7 @@ class PwmdPrivate : public Pwmd
 
     private slots:
         void slotCommandResult(PwmdCommandQueueItem *, QString, gpg_error_t,
-                                bool);
+                               bool);
 
     private:
         UserAccount userAccount;

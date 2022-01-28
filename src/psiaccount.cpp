@@ -1843,52 +1843,50 @@ void PsiAccount::cs_securityLayerActivated(int layer)
 }
 
 #ifdef HAVE_LIBPWMD
-void
-PsiAccount::slotElementContentResult(gpg_error_t rc, QString result)
+void PsiAccount::slotElementContentResult(gpg_error_t rc, QString result)
 {
-  delete pwm;
-  pwm = NULL;
+    delete pwm;
+    pwm = nullptr;
 
-  if (rc)
-    {
-      d->stream->abortAuth();
-      return;
+    if (rc) {
+        d->stream->abortAuth();
+        return;
     }
 
-  d->stream->setPassword(result);
-  if (d->acc.opt_pass) {
-      // keychain read success. erase from xml if any
-      d->acc.opt_pass = false;
-      emit updatedAccount();
-  }
-  d->stream->continueAfterParams();
+    d->stream->setPassword(result);
+
+    if (d->acc.opt_pass) {
+        // libpwmd read success. erase from xml if any
+        d->acc.opt_pass = false;
+        emit updatedAccount();
+    }
+
+    d->stream->continueAfterParams();
 }
 
-void
-PsiAccount::slotSaveElementContentResult(gpg_error_t rc, bool done)
+// Called both after storing a password and after saving the data file.
+void PsiAccount::slotSaveElementContentResult(gpg_error_t rc, bool done)
 {
-  if (rc || done)
-    {
+  if (rc || done) {
       delete pwm;
-      pwm = NULL;
-      if (!rc && done)
-        {
+      pwm = nullptr;
+
+      if (!rc && done) {
           d->acc.opt_pass = false;
           d->acc.pass.clear();
           emit updatedAccount(); // to rewrite accounts.xml
-        }
+      }
       return;
     }
 
   pwm->save();
 }
 
-void
-PsiAccount::slotKnownHostCallback (void *data, const char *host,
-                                   const char *key, size_t len)
+void PsiAccount::slotKnownHostCallback (void *data, const char *host,
+                                        const char *key, size_t len)
 {
-  gpg_error_t rc = Pwmd::knownHostPrompt (data, host, key, len);
-  emit knownHostRc (rc);
+    gpg_error_t rc = Pwmd::knownHostPrompt(data, host, key, len);
+    emit knownHostRc(rc);
 }
 #endif
 
@@ -1926,8 +1924,7 @@ void PsiAccount::cs_needAuthParams(bool user, bool pass, bool realm)
 
 #ifdef HAVE_LIBPWMD
     if (isLibpwmdEnabled()) {
-        if (PwmdPrivate::checkRequirements())
-          {
+        if (PwmdPrivate::checkRequirements()) {
             pwm = new PwmdPrivate(userAccount(), this);
             connect(pwm,
                     SIGNAL(elementContentResult(gpg_error_t, QString)),
@@ -1940,9 +1937,9 @@ void PsiAccount::cs_needAuthParams(bool user, bool pass, bool realm)
                     SLOT (slotKnownHostCallback(void *, const char *,
                                                 const char *, size_t)));
             pwm->getPassword();
-          }
+        }
         else
-          d->stream->abortAuth();
+            d->stream->abortAuth();
         return;
     }
 #endif
@@ -3264,19 +3261,18 @@ bool PsiAccount::passwordPrompt()
         savePassword();
         return true;
     }
+
     return false;
 }
 
 void PsiAccount::savePassword()
 {
 #ifdef HAVE_LIBPWMD
-    if (isLibpwmdEnabled())
-      {
+    if (isLibpwmdEnabled()) {
         if (!d->acc.opt_pass)
-          return;
+            return;
 
-        if (PwmdPrivate::checkRequirements())
-          {
+        if (PwmdPrivate::checkRequirements()) {
             pwm = new PwmdPrivate(userAccount(), this);
             connect(pwm,
                     SIGNAL(saveElementContentResult(gpg_error_t, bool)),
@@ -3289,7 +3285,7 @@ void PsiAccount::savePassword()
                     SLOT (slotKnownHostCallback(void *, const char *,
                                                 const char *, size_t)));
             pwm->savePassword();
-          }
+        }
         return;
       }
 #endif

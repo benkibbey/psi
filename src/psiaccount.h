@@ -339,7 +339,7 @@ signals:
     void endBulkContactUpdate();
     void rosterRequestFinished();
 #ifdef HAVE_LIBPWMD
-    void knownHostRc (gpg_error_t);
+    void knownHostRc(gpg_error_t);
 #endif
 
 public slots:
