@@ -4,6 +4,9 @@
 #include "common.h"
 #include "proxy.h"
 #include "psioptions.h"
+#ifdef HAVE_LIBPWMD
+#include "pwmd.h"
+#endif
 #include "translationmanager.h"
 #include "ui_opt_application.h"
 #include "varlist.h"
@@ -105,6 +108,7 @@ QWidget *OptionsTabApplication::widget()
     connect(d->ck_auto_load, &QCheckBox::toggled, this, [this]() { autostartOptChanged_ = true; });
 #ifdef HAVE_LIBPWMD
     connect(d->pb_socket, SIGNAL(clicked(bool)), this, SLOT(slotSelectSocket(bool)));
+    connect(d->pb_dataFile, SIGNAL(clicked(bool)), this, SLOT(slotSelectDatafile(bool)));
 #ifdef HAVE_KEYCHAIN
     connect(d->ck_useKeychain, SIGNAL(stateChanged(int)), this, SLOT(slotUseKeychainChanged(int)));
     connect(d->gb_useLibpwmd, SIGNAL(clicked(bool)), this, SLOT(slotUseLibpwmdChanged(bool)));
@@ -131,12 +135,11 @@ void OptionsTabApplication::slotUseLibpwmdChanged(bool b)
     OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
 
     if (b)
-      d->ck_useKeychain->setChecked(false);
+        d->ck_useKeychain->setChecked(false);
 }
 #endif
 
-void
-OptionsTabApplication::slotSelectSocket(bool b)
+void OptionsTabApplication::slotSelectSocket(bool b)
 {
     (void)b;
     OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
@@ -146,6 +149,29 @@ OptionsTabApplication::slotSelectSocket(bool b)
         return;
 
     d->le_socket->setText(p.socket());
+}
+
+void OptionsTabApplication::slotSelectDatafile(bool b)
+{
+    Pwmd editor = Pwmd();
+    OptApplicationUI *d = static_cast<OptApplicationUI *>(w);
+    QString rootElement = d->le_rootElement->text();
+    QString result;
+
+    rootElement.replace("^", "\t", Qt::CaseInsensitive);
+    rootElement.replace("<TAB>", "\t", Qt::CaseInsensitive);
+
+    b = editor.spawnEditor(result, d->le_socket->text(),
+                           d->le_dataFile->text(), rootElement);
+    if (!b)
+        return;
+
+    int offset = 0;
+    d->le_socket->setText(Pwmd::extractToken(result, "<SOCKET>", offset));
+    d->le_dataFile->setText(Pwmd::extractToken(result, "<FILE>", offset));
+    rootElement = Pwmd::extractToken(result, "<PATH>", offset);
+    rootElement.replace("\t", "^", Qt::CaseInsensitive);
+    d->le_rootElement->setText(rootElement);
 }
 #endif
 

@@ -28,6 +28,7 @@ private slots:
     void doEnableQuitOnClose(int);
 #ifdef HAVE_LIBPWMD
     void slotSelectSocket(bool);
+    void slotSelectDatafile(bool);
 #ifdef HAVE_KEYCHAIN
     void slotUseKeychainChanged(int);
     void slotUseLibpwmdChanged(bool);
